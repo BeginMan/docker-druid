@@ -1,6 +1,12 @@
 FROM ubuntu:14.04
 
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+# 添加网易镜像源
+RUN sed -i 's/http:\/\/archive\.ubuntu\.com\/ubuntu\//http:\/\/mirrors\.163\.com\/ubuntu\//g' /etc/apt/sources.list
+
 # Java 8
+RUN apt-get update
 RUN apt-get install -y software-properties-common \
       && apt-add-repository -y ppa:webupd8team/java \
       && apt-get purge --auto-remove -y software-properties-common \
@@ -86,6 +92,7 @@ RUN /etc/init.d/mysql start \
       && /etc/init.d/mysql stop
 
 # Setup supervisord
+
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Expose ports:
@@ -95,6 +102,7 @@ ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # - 8090: HTTP (overlord)
 # - 3306: MySQL
 # - 2181 2888 3888: ZooKeeper
+
 EXPOSE 8081
 EXPOSE 8082
 EXPOSE 8083
